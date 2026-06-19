@@ -13,7 +13,7 @@ def clipboard_to_word(output_filename="solution.docx"):
     clean_text = raw_text.replace(r'\[', '$$').replace(r'\]', '$$')
     clean_text = clean_text.replace(r'\(', '$').replace(r'\)', '$')
 
-    template_path = "template.docx"
+    template_path = "../template.docx"
 
     if not os.path.exists(template_path):
         print(f"Внимание: файл шаблона {template_path} не найден. Использую стандартные настройки.")

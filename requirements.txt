@@ -1,2 +1,4 @@
 pyperclip
 pypandoc
+flask
+python-docx
