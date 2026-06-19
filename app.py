@@ -1,4 +1,5 @@
 import os
+import re  # Добавляем модуль для регулярных выражений
 from flask import Flask, request, render_template, send_file
 import pypandoc
 import docx
@@ -7,9 +8,16 @@ app = Flask(__name__)
 
 
 def process_text_to_word(raw_text, output_path):
-    # Преобразуем синтаксис
-    clean_text = raw_text.replace(r'\[', '$$').replace(r'\]', '$$')
-    clean_text = clean_text.replace(r'\(', '$').replace(r'\)', '$')
+    # Используем регулярные выражения, чтобы заменить скобки на доллары
+    # И заодно удаляем пробелы СРАЗУ после открывающей скобки и ПЕРЕД закрывающей
+
+    # Для блочных формул \[ ... \] -> $$...$$
+    clean_text = re.sub(r'\\\[\s*', '$$', raw_text)
+    clean_text = re.sub(r'\s*\\\]', '$$', clean_text)
+
+    # Для строчных формул \( ... \) -> $...$
+    clean_text = re.sub(r'\\\(\s*', '$', clean_text)
+    clean_text = re.sub(r'\s*\\\)', '$', clean_text)
 
     template_path = "template.docx"
     extra_args = []
