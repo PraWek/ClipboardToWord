@@ -6,32 +6,33 @@
     <title>Clipboard to Word</title>
     <style>
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f8f9fa; color: #212529; margin: 0; padding: 40px; }
-        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .container { max-width: 950px; margin: 0 auto; background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         h2 { text-align: center; color: #1e293b; margin-bottom: 25px; font-weight: 600; }
 
+        .preset-panel { background: #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; }
+        .preset-panel label { font-weight: bold; color: #1e293b; font-size: 14px; }
+        .preset-panel select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; background: #fff; font-weight: 600; color: #2563eb; outline: none; width: 300px; }
+
         .settings-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-        .settings-section-title { grid-column: 1 / -1; font-size: 14px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: -10px; padding-bottom: 5px; border-bottom: 1px solid #cbd5e1; }
+        .settings-section-title { grid-column: 1 / -1; font-size: 13px; color: #64748b; font-weight: bold; text-transform: uppercase; margin-bottom: -10px; padding-bottom: 5px; border-bottom: 1px solid #cbd5e1; }
 
         .settings-group { display: flex; flex-direction: column; gap: 6px; }
         .settings-group label { font-size: 13px; font-weight: 600; color: #475569; }
         .settings-group select, .settings-group input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; font-size: 14px; outline: none; }
-        .settings-group input[type="number"] { width: 100%; box-sizing: border-box; }
 
         .form-group { margin-bottom: 20px; }
         label.section-label { font-weight: bold; display: block; margin-bottom: 8px; color: #334155; }
 
-        .file-upload-zone { background: #fff; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 8px; text-align: center; position: relative; cursor: pointer; transition: border-color 0.2s; }
-        .file-upload-zone:hover { border-color: #3b82f6; }
+        .file-upload-zone { background: #fff; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 8px; text-align: center; position: relative; cursor: pointer; }
         .file-upload-zone input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
         .file-status { display: none; margin-top: 12px; background: #e2e8f0; padding: 10px 15px; border-radius: 6px; align-items: center; justify-content: space-between; }
-        .file-name { font-size: 14px; color: #334155; font-weight: 500; word-break: break-all; text-align: left; }
         .btn-delete-file { background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
 
-        textarea { width: 100%; height: 200px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; box-sizing: border-box; font-family: monospace; font-size: 13px; outline: none; }
+        textarea { width: 100%; height: 220px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; box-sizing: border-box; font-family: monospace; font-size: 13px; outline: none; }
 
         .separator { text-align: center; margin: 20px 0; color: #94a3b8; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px; }
-        button.btn-submit { display: block; width: 100%; background: #2563eb; color: #fff; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button.btn-submit { display: block; width: 100%; background: #2563eb; color: #fff; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; }
         button.btn-submit:hover { background: #1d4ed8; }
     </style>
 </head>
@@ -41,66 +42,84 @@
 
         <form method="POST" enctype="multipart/form-data" id="converterForm">
 
+            <div class="preset-panel">
+                <label for="presetSelect">Готовый шаблон:</label>
+                <select id="presetSelect">
+                    <option value="custom" selected>Пользовательский (ручная настройка)</option>
+                    <option value="bmstu_practice">Отчёт по практике (МГТУ / ГОСТ 7.32)</option>
+                    <option value="gost_standard">Стандартный ГОСТ (Поля 30/15/20/20)</option>
+                </select>
+            </div>
+
             <div class="settings-container">
                 <div class="settings-section-title">Текст и шрифт</div>
                 <div class="settings-group">
-                    <label>Шрифт</label>
-                    <select name="font_name">
-                        <option value="Times New Roman" selected>Times New Roman</option>
-                        <option value="Calibri">Calibri</option>
+                    <label>Шрифт основного текста</label>
+                    <select name="font_name" id="font_name">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Calibri" selected>Calibri</option>
                         <option value="Arial">Arial</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
                     </select>
                 </div>
                 <div class="settings-group">
-                    <label>Размер (pt)</label>
-                    <select name="font_size">
+                    <label>Размер шрифта (pt)</label>
+                    <select name="font_size" id="font_size">
+                        <option value="8">8</option>
+                        <option value="9" selected>9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
                         <option value="12">12</option>
-                        <option value="14" selected>14</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
                     </select>
                 </div>
                 <div class="settings-group">
-                    <label>Выравнивание</label>
-                    <select name="alignment">
-                        <option value="justify" selected>По ширине</option>
-                        <option value="left">По левому краю</option>
+                    <label>Выравнивание текста</label>
+                    <select name="alignment" id="alignment">
+                        <option value="left" selected>По левому краю</option>
+                        <option value="justify">По ширине (Justify)</option>
                         <option value="center">По центру</option>
+                        <option value="right">По правому краю</option>
                     </select>
                 </div>
 
-                <div class="settings-section-title">Абзац</div>
+                <div class="settings-section-title">Абзацные интервалы</div>
                 <div class="settings-group">
-                    <label>Интервал</label>
-                    <select name="line_spacing">
+                    <label>Межстрочный интервал</label>
+                    <select name="line_spacing" id="line_spacing">
                         <option value="1.0">Одинарный (1.0)</option>
-                        <option value="1.15">Множитель (1.15)</option>
-                        <option value="1.5" selected>Полуторный (1.5)</option>
+                        <option value="1.15" selected>Множитель (1.15)</option>
+                        <option value="1.4">Множитель (1.4)</option>
+                        <option value="1.5">Полуторный (1.5)</option>
                         <option value="2.0">Двойной (2.0)</option>
                     </select>
                 </div>
                 <div class="settings-group">
-                    <label>Отступ первой строки (см)</label>
-                    <input type="number" name="first_line_indent" value="1.25" step="0.01" min="0">
+                    <label>Абзацный отступ / Красная строка (см)</label>
+                    <input type="number" name="first_line_indent" id="first_line_indent" value="0.0" step="0.05" min="0">
                 </div>
-                <div class="settings-group">
-                    </div>
+                <div></div>
 
-                <div class="settings-section-title">Поля страницы (см)</div>
+                <div class="settings-section-title">Поля страницы (сантиметры)</div>
                 <div class="settings-group">
-                    <label>Левое</label>
-                    <input type="number" name="margin_left" value="3.0" step="0.1" min="0">
+                    <label>Левое поле</label>
+                    <input type="number" name="margin_left" id="margin_left" value="2.5" step="0.1" min="0">
                 </div>
                 <div class="settings-group">
-                    <label>Правое</label>
-                    <input type="number" name="margin_right" value="1.5" step="0.1" min="0">
+                    <label>Правое поле</label>
+                    <input type="number" name="margin_right" id="margin_right" value="2.5" step="0.1" min="0">
                 </div>
-                <div style="display: flex; gap: 20px;">
+                <div style="display: flex; gap: 15px;">
                     <div class="settings-group" style="flex: 1;">
                         <label>Верхнее</label>
-                        <input type="number" name="margin_top" value="2.0" step="0.1" min="0">
+                        <input type="number" name="margin_top" id="margin_top" value="2.0" step="0.1" min="0">
                     </div>
                     <div class="settings-group" style="flex: 1;">
                         <label>Нижнее</label>
-                        <input type="number" name="margin_bottom" value="2.0" step="0.1" min="0">
+                        <input type="number" name="margin_bottom" id="margin_bottom" value="2.0" step="0.1" min="0">
                     </div>
                 </div>
             </div>
@@ -111,9 +130,8 @@
                     <span style="color: #64748b; font-size: 14px;">Перетащите файл сюда или кликните для выбора</span>
                     <input type="file" name="file" id="fileInput" accept=".txt,.md,.docx">
                 </div>
-
                 <div class="file-status" id="fileStatusBlock">
-                    <div class="file-name" id="attachedFileName"></div>
+                    <div id="attachedFileName" style="font-size: 14px; color: #334155; font-weight: 500;"></div>
                     <button type="button" class="btn-delete-file" onclick="clearAttachedFile(event)">Удалить</button>
                 </div>
             </div>
@@ -122,14 +140,62 @@
 
             <div class="form-group">
                 <label class="section-label">Способ 2: Вставить текст</label>
-                <textarea name="text_input" placeholder="Вставьте текст с LaTeX формулами..."></textarea>
+                <textarea name="text_input" placeholder="Вставьте текст с формулами LaTeX сюда..."></textarea>
             </div>
 
-            <button type="submit" class="btn-submit">Сконвертировать по ГОСТ</button>
+            <button type="submit" class="btn-submit">Сконвертировать документ</button>
         </form>
     </div>
 
     <script>
+        // Данные готовых шаблонов
+        const templates = {
+            bmstu_practice: {
+                font_name: "Times New Roman",
+                font_size: "14",
+                alignment: "justify",
+                line_spacing: "1.5",
+                first_line_indent: "1.25",
+                margin_left: "3.0",
+                margin_right: "1.0",
+                margin_top: "2.0",
+                margin_bottom: "2.0"
+            },
+            gost_standard: {
+                font_name: "Times New Roman",
+                font_size: "14",
+                alignment: "justify",
+                line_spacing: "1.5",
+                first_line_indent: "1.25",
+                margin_left: "3.0",
+                margin_right: "1.5",
+                margin_top: "2.0",
+                margin_bottom: "2.0"
+            }
+        };
+
+        const presetSelect = document.getElementById('presetSelect');
+        const fields = ['font_name', 'font_size', 'alignment', 'line_spacing', 'first_line_indent', 'margin_left', 'margin_right', 'margin_top', 'margin_bottom'];
+
+        // Логика переключения шаблонов
+        presetSelect.addEventListener('change', function() {
+            const selectedPreset = this.value;
+            if (selectedPreset !== 'custom' && templates[selectedPreset]) {
+                const data = templates[selectedPreset];
+                fields.forEach(field => {
+                    document.getElementById(field).value = data[field];
+                });
+            }
+        });
+
+        // Если пользователь меняет любую метрику руками, сбрасываем шаблон на "Пользовательский"
+        fields.forEach(field => {
+            document.getElementById(field).addEventListener('input', () => {
+                presetSelect.value = 'custom';
+            });
+        });
+
+        // Управление файлами
         const fileInput = document.getElementById('fileInput');
         const fileStatusBlock = document.getElementById('fileStatusBlock');
         const attachedFileName = document.getElementById('attachedFileName');
